@@ -49,7 +49,11 @@ async def _run() -> None:
         scheduler.stop()
 
     for sig in (signal.SIGINT, signal.SIGTERM):
-        loop.add_signal_handler(sig, _signal_handler)
+        try:
+            loop.add_signal_handler(sig, _signal_handler)
+        except NotImplementedError:
+            # Windows — Ctrl-C is handled via KeyboardInterrupt in main()
+            pass
 
     scheduler_task = asyncio.create_task(scheduler.run())
     try:
